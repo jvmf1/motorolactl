@@ -15,6 +15,7 @@ parser.add_argument('--set-hue', type=int)
 parser.add_argument('--set-saturation', type=int)
 parser.add_argument('--cfg-file', default='normal', choices=['normal','day','night'])
 parser.add_argument('--list-display-settings', action='store_true')
+parser.add_argument('--list-display-settings-caps', action='store_true')
 parser.add_argument('--list-video', action='store_true')
 parser.add_argument('--list-video-caps', action='store_true')
 parser.add_argument('--list-device-info', action='store_true')
@@ -61,6 +62,12 @@ def pprint(data, i=0, ignoreat=True):
 if args.list_display_settings:
     print(separator)
     pprint(xmltodict.parse(session.post(f"http://{args.i}/GetImageConfigEx/1").content)['config']['image'])
+    print(separator)
+    exit()
+
+if args.list_display_settings_caps:
+    print(separator)
+    pprint(xmltodict.parse(session.post(f"http://{args.i}/GetImageConfigEx/1").content)['config']['types'])
     print(separator)
     exit()
 
