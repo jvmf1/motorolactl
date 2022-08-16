@@ -15,6 +15,7 @@ parser.add_argument('--list-video-caps', action='store_true')
 parser.add_argument('--list-device-info', action='store_true')
 parser.add_argument('--list-time', action='store_true')
 parser.add_argument('--list-online-users', action='store_true')
+parser.add_argument('--list-users', action='store_true')
 args=parser.parse_args()
 
 session = requests.Session()
@@ -71,23 +72,57 @@ if args.list_time:
     exit()
 
 if args.list_video:
-    #pprint(xmltodict.parse(session.post(f"http://{args.i}/GetVideoStreamConfig").content)['config']['streams']['item'])
-    for item in xmltodict.parse(session.post(f"http://{args.i}/GetVideoStreamConfig").content)['config']['streams']['item']:
+    data = xmltodict.parse(session.post(f"http://{args.i}/GetVideoStreamConfig").content)['config']['streams']['item']
+    if type(data)!=list:
         print(separator)
-        pprint(item)
-    print(separator)
-    exit()
+        pprint(data)
+        print(separator)
+        exit()
+    else:
+        for item in data:
+            print(separator)
+            pprint(item)
+        print(separator)
+        exit()
 
 if args.list_video_caps:
-    for item in xmltodict.parse(session.post(f"http://{args.i}/GetStreamCaps").content)['config']['streamList']['item']:
+    data = xmltodict.parse(session.post(f"http://{args.i}/GetStreamCaps").content)['config']['streamList']['item']
+    if type(data)!=list:
         print(separator)
-        pprint(item)
-    print(separator)
-    exit()
+        pprint(data)
+        print(separator)
+        exit()
+    else:
+        for item in data:
+            print(separator)
+            pprint(item)
+        print(separator)
+        exit()
 
 if args.list_online_users:
-    for item in xmltodict.parse(session.post(f"http://{args.i}/GetVideoOnlineUser").content)['config']['videoOnlineUser']['item']:
+    data = xmltodict.parse(session.post(f"http://{args.i}/GetVideoOnlineUser").content)['config']['videoOnlineUser']['item']
+    if type(data)!=list:
         print(separator)
-        pprint(item)
-    print(separator)
-    exit()
+        pprint(data)
+        print(separator)
+        exit()
+    else:
+        for item in data:
+            print(separator)
+            pprint(item)
+        print(separator)
+        exit()
+
+if args.list_users:
+    data = xmltodict.parse(session.post(f"http://{args.i}/GetUsers").content)['config']['user']['item']
+    if type(data)!=list:
+        print(separator)
+        pprint(data)
+        print(separator)
+        exit()
+    else:
+        for item in data:
+            print(separator)
+            pprint(item)
+        print(separator)
+        exit()
