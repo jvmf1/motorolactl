@@ -14,6 +14,8 @@ parser.add_argument('--set-contrast', type=int)
 parser.add_argument('--set-hue', type=int)
 parser.add_argument('--set-saturation', type=int)
 parser.add_argument('--set-infra-red-mode', choices=['auto','on','off'])
+parser.add_argument('--set-mirror', choices=['true','false'])
+parser.add_argument('--set-flip', choices=['true','false'])
 parser.add_argument('--cfg-file', default='normal', choices=['normal','day','night'])
 parser.add_argument('--list-display-settings', action='store_true')
 parser.add_argument('--list-display-settings-caps', action='store_true')
@@ -143,7 +145,7 @@ if args.list_users:
 edit_image = False
 edit_image_data = {'config':{'image':{}, 'cfgFile':args.cfg_file}}
 
-if args.set_brightness or args.set_contrast or args.set_hue or args.set_saturation or args.set_infra_red_mode:
+if args.set_brightness or args.set_contrast or args.set_hue or args.set_saturation or args.set_infra_red_mode or args.set_mirror or args.set_flip:
     edit_image = True
 
 if edit_image:
@@ -162,6 +164,12 @@ if edit_image:
 
     if args.set_infra_red_mode:
         edit_image_data['config']['image']['InfraredMode'] = str(args.set_infra_red_mode)
+
+    if args.set_mirror:
+        edit_image_data['config']['image']['mirrorSwitch'] = str(args.set_mirror)
+
+    if args.set_flip:
+        edit_image_data['config']['image']['flipSwitch'] = str(args.set_flip)
 
 if edit_image:
     data = xmltodict.parse(session.post(f"http://{args.i}/SetImageConfig/1",data=xmltodict.unparse(edit_image_data)).text)
