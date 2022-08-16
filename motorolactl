@@ -17,6 +17,7 @@ parser.add_argument('--set-infra-red-mode', choices=['auto','on','off'])
 parser.add_argument('--set-mirror', choices=['true','false'])
 parser.add_argument('--set-flip', choices=['true','false'])
 parser.add_argument('--cfg-file', default='normal', choices=['normal','day','night'])
+parser.add_argument('--reboot', action='store_true')
 parser.add_argument('--list-display-settings', action='store_true')
 parser.add_argument('--list-display-settings-caps', action='store_true')
 parser.add_argument('--list-video', action='store_true')
@@ -61,6 +62,10 @@ def pprint(data, i=0, ignoreat=True):
     elif type(data) == list:
         for v in data:
             pprint(v,i, ignoreat)
+
+if args.reboot:
+    data = xmltodict.parse(session.post(f"http://{args.i}/Reboot").text)
+    print(data['config']['@status'])
 
 if args.list_display_settings:
     print(separator)
