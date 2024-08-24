@@ -9,6 +9,11 @@ parser=argparse.ArgumentParser()
 parser.add_argument('-i', required=True, metavar='ip')
 parser.add_argument('-u', required=True, metavar='username')
 parser.add_argument('-p', required=True, metavar='password')
+parser.add_argument('--set-brightness', type=int)
+parser.add_argument('--set-contrast', type=int)
+parser.add_argument('--set-hue', type=int)
+parser.add_argument('--set-saturation', type=int)
+parser.add_argument('--cfg-file', default='normal', choices=['normal','day','night'])
 parser.add_argument('--list-display-settings', action='store_true')
 parser.add_argument('--list-video', action='store_true')
 parser.add_argument('--list-video-caps', action='store_true')
@@ -126,3 +131,25 @@ if args.list_users:
             pprint(item)
         print(separator)
         exit()
+
+edit_image = False
+edit_image_data = {'config':{'image':{}, 'cfgFile':args.cfg_file}}
+
+if args.set_brightness or args.set_contrast or args.set_hue or args.set_saturation:
+    edit_image = True
+
+if args.set_brightness:
+    edit_image_data['config']['image']['bright'] = str(args.set_brightness)
+
+if args.set_contrast:
+    edit_image_data['config']['image']['contrast'] = str(args.set_contrast)
+
+if args.set_hue:
+    edit_image_data['config']['image']['hue'] = str(args.set_hue)
+
+if args.set_saturation:
+    edit_image_data['config']['image']['saturation'] = str(args.set_saturation)
+
+if edit_image:
+    data = xmltodict.parse(session.post(f"http://{args.i}/SetImageConfig/1",data=xmltodict.unparse(edit_image_data)).text)
+    print(data['config']['@status'])
