@@ -1,0 +1,93 @@
+#!/usr/bin/env python3
+import requests
+import cv2
+import xmltodict
+import argparse
+import os
+
+parser=argparse.ArgumentParser()
+parser.add_argument('-i', required=True, metavar='ip')
+parser.add_argument('-u', required=True, metavar='username')
+parser.add_argument('-p', required=True, metavar='password')
+parser.add_argument('--list-display-settings', action='store_true')
+parser.add_argument('--list-video', action='store_true')
+parser.add_argument('--list-video-caps', action='store_true')
+parser.add_argument('--list-device-info', action='store_true')
+parser.add_argument('--list-time', action='store_true')
+parser.add_argument('--list-online-users', action='store_true')
+args=parser.parse_args()
+
+session = requests.Session()
+session.auth=(args.u,args.p)
+
+try:
+    h = os.get_terminal_size().lines
+    w = os.get_terminal_size().columns
+except:
+    h=0
+    w=0
+
+separator='-'*w
+
+def pprint(data, i=0, ignoreat=True):
+    if type(data) == str:
+        print('\t'*i, end='')
+        print(data)
+    elif type(data) == dict:
+        for k, v in data.items():
+            if '@xmlns' in k or '@version' in k:
+                continue
+            if ignoreat and '@' in k:
+                continue
+            print('\t'*i,end='')
+            if type(v) == dict:
+                print(k)
+            elif type(v) == list:
+                print(k)
+            else:
+                print(k,v)
+            if not type(v) == str:
+                pprint(v, i+1, ignoreat)
+    elif type(data) == list:
+        for v in data:
+            pprint(v,i, ignoreat)
+
+if args.list_display_settings:
+    print(separator)
+    pprint(xmltodict.parse(session.post(f"http://{args.i}/GetImageConfigEx/1").content)['config']['image'])
+    print(separator)
+    exit()
+
+if args.list_device_info:
+    print(separator)
+    pprint(xmltodict.parse(session.post(f"http://{args.i}/GetDeviceInfo").content)['config']['deviceInfo'])
+    print(separator)
+    exit()
+
+if args.list_time:
+    print(separator)
+    pprint(xmltodict.parse(session.post(f"http://{args.i}/GetDateAndTime").content)['config']['time'])
+    print(separator)
+    exit()
+
+if args.list_video:
+    #pprint(xmltodict.parse(session.post(f"http://{args.i}/GetVideoStreamConfig").content)['config']['streams']['item'])
+    for item in xmltodict.parse(session.post(f"http://{args.i}/GetVideoStreamConfig").content)['config']['streams']['item']:
+        print(separator)
+        pprint(item)
+    print(separator)
+    exit()
+
+if args.list_video_caps:
+    for item in xmltodict.parse(session.post(f"http://{args.i}/GetStreamCaps").content)['config']['streamList']['item']:
+        print(separator)
+        pprint(item)
+    print(separator)
+    exit()
+
+if args.list_online_users:
+    for item in xmltodict.parse(session.post(f"http://{args.i}/GetVideoOnlineUser").content)['config']['videoOnlineUser']['item']:
+        print(separator)
+        pprint(item)
+    print(separator)
+    exit()
